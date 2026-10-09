@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="24dp">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Registar Reciclagem"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Material (plastico, vidro, papel):"
+            android:layout_marginBottom="8dp"/>
+
+    <EditText
+            android:id="@+id/etMaterialType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ex: plastico"
+            android:layout_marginBottom="16dp"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quantidade (unidades/kg):"
+            android:layout_marginBottom="8dp"/>
+
+    <EditText
+            android:id="@+id/etQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Ex: 5"
+            android:layout_marginBottom="24dp"/>
+
+    <Button
+            android:id="@+id/btnSubmitRecycle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submeter e Ganhar Pontos"/>
+
+</LinearLayout>
