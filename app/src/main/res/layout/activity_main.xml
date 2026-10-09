@@ -1,7 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="24dp"
+              android:gravity="center_horizontal">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EcoGuide - Sustentabilidade Urbana"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="32dp"/>
+
+    <Button
+            android:id="@+id/btnMap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🗺️ Ecopontos Próximos (GPS)"
+            android:layout_marginBottom="16dp"/>
+
+    <Button
+            android:id="@+id/btnRecycle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="♻️ Registar Reciclagem (Input)"
+            android:layout_marginBottom="16dp"/>
+
+    <Button
+            android:id="@+id/btnProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🏆 Perfil e Medalhas"/>
 
 </LinearLayout>
