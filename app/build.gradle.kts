@@ -29,9 +29,7 @@ android {
 }
 
 
-kotlin {
-    jvmToolchain(11)
-}
+
 
 dependencies {
     // Versão estável do Core e AppCompat compatível com o Gradle atual
