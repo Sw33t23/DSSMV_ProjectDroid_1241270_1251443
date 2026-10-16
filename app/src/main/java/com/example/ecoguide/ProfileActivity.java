@@ -3,6 +3,7 @@ package com.example.ecoguide;
 import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.ecoguide.model.UserProfile;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -15,7 +16,8 @@ public class ProfileActivity extends AppCompatActivity {
         TextView tvPoints = findViewById(R.id.tvPoints);
         TextView tvBadges = findViewById(R.id.tvBadges);
 
-        var user = RecycleActivity.currentUser;
+        // Criamos uma instância de perfil padrão para visualização no ecrã de perfil
+        UserProfile user = new UserProfile("EcoUtilizador");
 
         tvUsername.setText("Utilizador: " + user.getUsername());
         tvPoints.setText("Pontos Ecológicos: " + user.getTotalPoints());

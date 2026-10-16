@@ -5,36 +5,70 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.ecoguide.model.UserProfile;
+import com.example.ecoguide.data.SupabaseHelper;
 
 public class RecycleActivity extends AppCompatActivity {
 
-    // Instância global simples para demonstrar os dados na app
-    public static UserProfile currentUser = new UserProfile("EcoUtilizador");
+    private SupabaseHelper supabaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recycle);
 
-        EditText etMaterial = findViewById(R.id.etMaterialType);
-        EditText etQuantity = findViewById(R.id.etQuantity);
+        supabaseHelper = new SupabaseHelper();
+
+        EditText etYellow = findViewById(R.id.etYellowSacks);
+        EditText etGreen = findViewById(R.id.etGreenSacks);
+        EditText etBlue = findViewById(R.id.etBlueSacks);
         Button btnSubmit = findViewById(R.id.btnSubmitRecycle);
 
         btnSubmit.setOnClickListener(v -> {
-            String material = etMaterial.getText().toString().trim();
-            String qtyStr = etQuantity.getText().toString().trim();
+            int yellow = parseSacks(etYellow.getText().toString());
+            int green = parseSacks(etGreen.getText().toString());
+            int blue = parseSacks(etBlue.getText().toString());
 
-            if (material.isEmpty() || qtyStr.isEmpty()) {
-                Toast.makeText(this, "Preenche todos os campos!", Toast.LENGTH_SHORT).show();
+            if (yellow == 0 && green == 0 && blue == 0) {
+                Toast.makeText(this, "Insere pelo menos uma saca num ecoponto!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            int quantity = Integer.parseInt(qtyStr);
-            currentUser.addRecycledItems(material, quantity);
+            int earnedPoints = (yellow * 15) + (green * 10) + (blue * 5);
 
-            Toast.makeText(this, "Registo efetuado! Pontos totais: " + currentUser.getTotalPoints(), Toast.LENGTH_LONG).show();
-            finish(); // Fecha o ecrã e volta ao menu principal
+            // ID de utilizador temporário para teste
+            String userId = "00000000-0000-0000-0000-000000000000";
+
+            btnSubmit.setEnabled(false); // Evitar duplo clique
+            Toast.makeText(this, "A enviar dados para a nuvem...", Toast.LENGTH_SHORT).show();
+
+            supabaseHelper.insertRecyclingRecord(userId, yellow, green, blue, earnedPoints, new SupabaseHelper.SupabaseCallback() {
+                @Override
+                public void onSuccess() {
+                    runOnUiThread(() -> {
+                        Toast.makeText(RecycleActivity.this, "Sucesso! Ganhaste " + earnedPoints + " pontos guardados na BD.", Toast.LENGTH_LONG).show();
+                        finish();
+                    });
+                }
+
+                @Override
+                public void onError(String error) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(RecycleActivity.this, "Erro ao enviar: " + error, Toast.LENGTH_LONG).show();
+                        btnSubmit.setEnabled(true);
+                    });
+                }
+            });
         });
+    }
+
+    private int parseSacks(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }
