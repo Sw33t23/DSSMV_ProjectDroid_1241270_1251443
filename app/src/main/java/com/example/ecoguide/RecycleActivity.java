@@ -34,18 +34,16 @@ public class RecycleActivity extends AppCompatActivity {
             }
 
             int earnedPoints = (yellow * 15) + (green * 10) + (blue * 5);
+            long userId = 1L; // ID do utilizador na tabela 'users' // ID temporário ou capturado da Intent
 
-            // ID de utilizador temporário para teste
-            String userId = "00000000-0000-0000-0000-000000000000";
-
-            btnSubmit.setEnabled(false); // Evitar duplo clique
+            btnSubmit.setEnabled(false);
             Toast.makeText(this, "A enviar dados para a nuvem...", Toast.LENGTH_SHORT).show();
 
             supabaseHelper.insertRecyclingRecord(userId, yellow, green, blue, earnedPoints, new SupabaseHelper.SupabaseCallback() {
                 @Override
                 public void onSuccess() {
                     runOnUiThread(() -> {
-                        Toast.makeText(RecycleActivity.this, "Sucesso! Ganhaste " + earnedPoints + " pontos guardados na BD.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(RecycleActivity.this, "Sucesso! Ganhaste " + earnedPoints + " pontos.", Toast.LENGTH_LONG).show();
                         finish();
                     });
                 }

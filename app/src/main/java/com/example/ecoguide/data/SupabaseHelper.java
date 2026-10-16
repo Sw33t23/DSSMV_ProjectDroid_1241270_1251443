@@ -10,9 +10,9 @@ import java.util.concurrent.Executors;
 
 public class SupabaseHelper {
 
-    // Substitui pelos teus dados reais do Supabase (Project Settings > API)
-    private static final String SUPABASE_URL = "https://hhmfwgstwpjeegojygog.supabase.co/rest/v1/recycling_records";
-    private static final String SUPABASE_ANON_KEY = "sb_publishable_1T4WcsZ2mz4cvgOsPKN9-A_RuAysq0O";
+    // URL base correto do PostgREST do Supabase
+    private static final String SUPABASE_URL = "https://hhmfwgstwpjeegojygog.supabase.co/rest/v1/";
+    private static final String API_KEY = "sb_publishable_1T4WcsZ2mz4cvgOsPKN9-A_RuAysq0O"; // Coloca aqui a tua Publishable Key real
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -21,21 +21,54 @@ public class SupabaseHelper {
         void onError(String error);
     }
 
-    public void insertRecyclingRecord(String userId, int yellow, int green, int blue, int points, SupabaseCallback callback) {
+    public void insertUser(String username, SupabaseCallback callback) {
         executorService.execute(() -> {
             try {
-                URL url = new URL(SUPABASE_URL);
+                // Endpoint direto para a tabela 'users'
+                URL url = new URL(SUPABASE_URL + "users");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
-                conn.setRequestProperty("apikey", SUPABASE_ANON_KEY);
-                conn.setRequestProperty("Authorization", "Bearer " + SUPABASE_ANON_KEY);
+                conn.setRequestProperty("apikey", API_KEY);
+                conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
                 conn.setRequestProperty("Prefer", "return=minimal");
                 conn.setDoOutput(true);
 
-                // Criar o JSON manualmente sem dependências externas pesadas
+                String jsonInputString = String.format("{\"username\":\"%s\", \"total_points\":0}", username);
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode >= 200 && responseCode < 300) {
+                    callback.onSuccess();
+                } else {
+                    callback.onError("Erro 404/Servidor (users): " + responseCode);
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("SupabaseHelper", "Erro de rede", e);
+                callback.onError(e.getMessage());
+            }
+        });
+    }
+
+    public void insertRecyclingRecord(long userId, int yellow, int green, int blue, int points, SupabaseCallback callback) {
+        executorService.execute(() -> {
+            try {
+                URL url = new URL(SUPABASE_URL + "recycle_records");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("apikey", API_KEY);
+                conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
+                conn.setRequestProperty("Prefer", "return=minimal");
+                conn.setDoOutput(true);
+
                 String jsonInputString = String.format(
-                        "{\"user_id\":\"%s\", \"sacks_yellow\":%d, \"sacks_green\":%d, \"sacks_blue\":%d, \"points_earned\":%d}",
+                        "{\"user_id\":%d, \"sacks_yellow\":%d, \"sacks_green\":%d, \"sacks_blue\":%d, \"points_earned\":%d}",
                         userId, yellow, green, blue, points
                 );
 
@@ -48,12 +81,11 @@ public class SupabaseHelper {
                 if (responseCode >= 200 && responseCode < 300) {
                     callback.onSuccess();
                 } else {
-                    callback.onError("Erro no servidor: " + responseCode);
+                    callback.onError("Erro 404/Servidor (records): " + responseCode);
                 }
-
                 conn.disconnect();
             } catch (Exception e) {
-                Log.e("SupabaseHelper", "Erro na rede", e);
+                Log.e("SupabaseHelper", "Erro de rede", e);
                 callback.onError(e.getMessage());
             }
         });
