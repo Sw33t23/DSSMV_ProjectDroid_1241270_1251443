@@ -5,11 +5,15 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.ecoguide.data.SupabaseHelper;
 import com.example.ecoguide.utils.LocationHelper;
 
 public class MainActivity extends AppCompatActivity {
 
     private LocationHelper locationHelper;
+    private SupabaseHelper supabaseHelper;
+    public static long currentUserId = -1L; // ID global do user logado
+    private String currentUsername = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,12 +21,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         locationHelper = new LocationHelper(this);
+        supabaseHelper = new SupabaseHelper();
+
+        // Receber o username do Login/Registo
+        currentUsername = getIntent().getStringExtra("USERNAME_KEY");
+        if (currentUsername == null) currentUsername = "EcoUtilizador";
+
+        // Obter o ID real do utilizador na BD com base no username
+        supabaseHelper.getUserIdByUsername(currentUsername, new SupabaseHelper.UserIdCallback() {
+            @Override
+            public void onUserIdFound(long userId) {
+                currentUserId = userId;
+            }
+
+            @Override
+            public void onError(String error) {
+                // Fallback de segurança caso ocorra erro
+                currentUserId = 1L;
+            }
+        });
 
         Button btnMap = findViewById(R.id.btnMap);
         Button btnRecycle = findViewById(R.id.btnRecycle);
         Button btnProfile = findViewById(R.id.btnProfile);
 
-        // Botão GPS / Ecopontos Próximos
         btnMap.setOnClickListener(v -> {
             locationHelper.getLastKnownLocation(new LocationHelper.LocationCallbackListener() {
                 @Override
@@ -37,13 +59,11 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
-        // Abrir Ecrã de Registo (User Input)
         btnRecycle.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, RecycleActivity.class);
             startActivity(intent);
         });
 
-        // Abrir Ecrã de Perfil e Medalhas
         btnProfile.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);

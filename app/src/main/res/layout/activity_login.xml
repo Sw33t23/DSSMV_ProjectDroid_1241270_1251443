@@ -20,6 +20,14 @@
             android:layout_height="wrap_content"
             android:hint="Nome de Utilizador"
             android:inputType="textPersonName"
+            android:layout_marginBottom="16dp"/>
+
+    <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Palavra-passe"
+            android:inputType="textPassword"
             android:layout_marginBottom="24dp"/>
 
     <Button
