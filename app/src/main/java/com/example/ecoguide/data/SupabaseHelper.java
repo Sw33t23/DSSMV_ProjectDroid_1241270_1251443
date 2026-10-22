@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 public class SupabaseHelper {
 
     private static final String SUPABASE_URL = "https://hhmfwgstwpjeegojygog.supabase.co/rest/v1/";
-    private static final String API_KEY = "sb_publishable_1T4WcsZ2mz4cvgOsPKN9-A_RuAysq0O"; // Coloca aqui a tua Publishable Key real
+    private static final String API_KEY = "TUA_PUBLISHABLE_KEY_AQUI"; // Substitui pela tua chave real do Supabase
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -29,7 +29,12 @@ public class SupabaseHelper {
         void onError(String error);
     }
 
-    // Inserir Utilizador
+    public interface EcopontosCallback {
+        void onEcopontosLoaded(JSONArray ecopontos);
+        void onError(String error);
+    }
+
+    // Inserir Utilizador na tabela 'users'
     public void insertUser(String username, String password, SupabaseCallback callback) {
         executorService.execute(() -> {
             try {
@@ -39,7 +44,7 @@ public class SupabaseHelper {
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("apikey", API_KEY);
                 conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
-                conn.setRequestProperty("Prefer", "return=minimal");
+                conn.setRequestProperty("Prefer", "return=representation");
                 conn.setDoOutput(true);
 
                 String jsonInputString = String.format("{\"username\":\"%s\", \"password\":\"%s\", \"total_points\":0}", username, password);
@@ -63,7 +68,7 @@ public class SupabaseHelper {
         });
     }
 
-    // Obter o ID real do utilizador através do username (GET /users?username=eq.X)
+    // Obter o ID real do utilizador por username
     public void getUserIdByUsername(String username, UserIdCallback callback) {
         executorService.execute(() -> {
             try {
@@ -102,7 +107,7 @@ public class SupabaseHelper {
         });
     }
 
-    // Inserir Registo de Reciclagem com o ID real
+    // Inserir Registo de Reciclagem na tabela 'recycle_records'
     public void insertRecyclingRecord(long userId, int yellow, int green, int blue, int points, SupabaseCallback callback) {
         executorService.execute(() -> {
             try {
@@ -112,7 +117,7 @@ public class SupabaseHelper {
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("apikey", API_KEY);
                 conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
-                conn.setRequestProperty("Prefer", "return=minimal");
+                conn.setRequestProperty("Prefer", "return=representation");
                 conn.setDoOutput(true);
 
                 String jsonInputString = String.format(
@@ -132,6 +137,39 @@ public class SupabaseHelper {
                     callback.onError("Erro HTTP (records): " + responseCode);
                 }
                 conn.disconnect();
+            } catch (Exception e) {
+                Log.e("SupabaseHelper", "Erro", e);
+                callback.onError(e.getMessage());
+            }
+        });
+    }
+
+    // Obter todos os ecopontos da tabela 'ecopontos' para o mapa
+    public void getEcopontos(EcopontosCallback callback) {
+        executorService.execute(() -> {
+            try {
+                URL url = new URL(SUPABASE_URL + "ecopontos");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("apikey", API_KEY);
+                conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == 200) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder content = new StringBuilder();
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        content.append(inputLine);
+                    }
+                    in.close();
+                    conn.disconnect();
+
+                    JSONArray ecopontosArray = new JSONArray(content.toString());
+                    callback.onEcopontosLoaded(ecopontosArray);
+                } else {
+                    callback.onError("Erro ao buscar ecopontos: " + responseCode);
+                }
             } catch (Exception e) {
                 Log.e("SupabaseHelper", "Erro", e);
                 callback.onError(e.getMessage());

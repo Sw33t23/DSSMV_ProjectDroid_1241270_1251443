@@ -29,6 +29,10 @@
         <activity android:name=".RecycleActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
 
+        <meta-data
+                android:name="com.google.android.gms.maps.API_KEY"
+                android:value="AIzaSyBhGnPn8tJV81Vj36DMqC8zm1xnYJTo8Ao" />
+
     </application>
 
 </manifest>

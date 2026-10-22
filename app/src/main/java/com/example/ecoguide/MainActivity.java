@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationHelper locationHelper;
     private SupabaseHelper supabaseHelper;
-    public static long currentUserId = -1L; // ID global do user logado
+    public static long currentUserId = -1L; // ID global do utilizador logado
     private String currentUsername = "";
 
     @Override
@@ -23,11 +23,13 @@ public class MainActivity extends AppCompatActivity {
         locationHelper = new LocationHelper(this);
         supabaseHelper = new SupabaseHelper();
 
-        // Receber o username do Login/Registo
+        // Receber o username enviado pelo Ecrã de Login ou Registo
         currentUsername = getIntent().getStringExtra("USERNAME_KEY");
-        if (currentUsername == null) currentUsername = "EcoUtilizador";
+        if (currentUsername == null) {
+            currentUsername = "EcoUtilizador";
+        }
 
-        // Obter o ID real do utilizador na BD com base no username
+        // Obter o ID real do utilizador na base de dados com base no username
         supabaseHelper.getUserIdByUsername(currentUsername, new SupabaseHelper.UserIdCallback() {
             @Override
             public void onUserIdFound(long userId) {
@@ -36,8 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(String error) {
-                // Fallback de segurança caso ocorra erro
-                currentUserId = 1L;
+                currentUserId = 1L; // Fallback de segurança caso ocorra falha de rede
             }
         });
 
@@ -45,25 +46,19 @@ public class MainActivity extends AppCompatActivity {
         Button btnRecycle = findViewById(R.id.btnRecycle);
         Button btnProfile = findViewById(R.id.btnProfile);
 
+        // Botão Mapa / GPS -> Abre o ecrã do Google Maps
         btnMap.setOnClickListener(v -> {
-            locationHelper.getLastKnownLocation(new LocationHelper.LocationCallbackListener() {
-                @Override
-                public void onLocationReceived(double latitude, double longitude) {
-                    Toast.makeText(MainActivity.this, "GPS Localizado: Lat " + latitude + ", Lon " + longitude, Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onLocationError(String error) {
-                    Toast.makeText(MainActivity.this, "Erro GPS: " + error, Toast.LENGTH_SHORT).show();
-                }
-            });
+            Intent intent = new Intent(MainActivity.this, MapActivity.class);
+            startActivity(intent);
         });
 
+        // Botão Registo de Reciclagem -> Abre o ecrã de input de sacas
         btnRecycle.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, RecycleActivity.class);
             startActivity(intent);
         });
 
+        // Botão Perfil -> Abre o ecrã de perfil e medalhas
         btnProfile.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
