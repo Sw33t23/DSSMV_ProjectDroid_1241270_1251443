@@ -35,10 +35,9 @@ public class RecycleActivity extends AppCompatActivity {
 
             int earnedPoints = (yellow * 15) + (green * 10) + (blue * 5);
 
-            // Vai buscar o ID real do utilizador logado (definido dinamicamente na MainActivity)
             long userId = MainActivity.currentUserId;
             if (userId == -1L) {
-                userId = 1L; // Fallback de segurança caso por algum motivo venha vazio
+                userId = 1L;
             }
 
             btnSubmit.setEnabled(false);

@@ -2,18 +2,22 @@ package com.example.ecoguide;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.Toast;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.ecoguide.data.SupabaseHelper;
 import com.example.ecoguide.utils.LocationHelper;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
     private LocationHelper locationHelper;
     private SupabaseHelper supabaseHelper;
-    public static long currentUserId = -1L; // ID global do utilizador logado
+    public static long currentUserId = -1L;
     private String currentUsername = "";
+
+    private TextView tvWelcome, tvUserPoints, tvUserBadge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,45 +27,93 @@ public class MainActivity extends AppCompatActivity {
         locationHelper = new LocationHelper(this);
         supabaseHelper = new SupabaseHelper();
 
-        // Receber o username enviado pelo Ecrã de Login ou Registo
+        tvWelcome = findViewById(R.id.tvWelcome);
+        tvUserPoints = findViewById(R.id.tvUserPoints);
+        tvUserBadge = findViewById(R.id.tvUserBadge);
+        ImageButton btnLogout = findViewById(R.id.btnLogout);
+
+        // Lógica do botão de Logout
+        btnLogout.setOnClickListener(v -> {
+            currentUserId = -1L;
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+
         currentUsername = getIntent().getStringExtra("USERNAME_KEY");
         if (currentUsername == null) {
             currentUsername = "EcoUtilizador";
         }
+        tvWelcome.setText("🌱 Olá, " + currentUsername + "!");
 
-        // Obter o ID real do utilizador na base de dados com base no username
         supabaseHelper.getUserIdByUsername(currentUsername, new SupabaseHelper.UserIdCallback() {
             @Override
             public void onUserIdFound(long userId) {
                 currentUserId = userId;
+                loadUserData(userId);
             }
 
             @Override
             public void onError(String error) {
-                currentUserId = 1L; // Fallback de segurança caso ocorra falha de rede
+                currentUserId = 1L;
+                loadUserData(currentUserId);
             }
         });
 
-        Button btnMap = findViewById(R.id.btnMap);
-        Button btnRecycle = findViewById(R.id.btnRecycle);
-        Button btnProfile = findViewById(R.id.btnProfile);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
-        // Botão Mapa / GPS -> Abre o ecrã do Google Maps
-        btnMap.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, MapActivity.class);
-            startActivity(intent);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                return true;
+            } else if (id == R.id.nav_map) {
+                startActivity(new Intent(MainActivity.this, MapActivity.class));
+                return true;
+            } else if (id == R.id.nav_recycle) {
+                startActivity(new Intent(MainActivity.this, RecycleActivity.class));
+                return true;
+            } else if (id == R.id.nav_profile) {
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                return true;
+            }
+            return false;
         });
+    }
 
-        // Botão Registo de Reciclagem -> Abre o ecrã de input de sacas
-        btnRecycle.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, RecycleActivity.class);
-            startActivity(intent);
-        });
+    private void loadUserData(long userId) {
+        supabaseHelper.getUserPoints(userId, new SupabaseHelper.PointsCallback() {
+            @Override
+            public void onPointsReceived(int points) {
+                runOnUiThread(() -> {
+                    tvUserPoints.setText(points + " pts");
+                    tvUserBadge.setText(calculateBadge(points));
+                });
+            }
 
-        // Botão Perfil -> Abre o ecrã de perfil e medalhas
-        btnProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-            startActivity(intent);
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> tvUserPoints.setText("0 pts"));
+            }
         });
+    }
+
+    private String calculateBadge(int points) {
+        if (points < 50) {
+            return "🌱 Eco-Iniciante";
+        } else if (points < 150) {
+            return "🌿 Eco-Amigo";
+        } else {
+            return "🌳 Mestre da Reciclagem";
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (currentUserId != -1L) {
+            loadUserData(currentUserId);
+        }
     }
 }
