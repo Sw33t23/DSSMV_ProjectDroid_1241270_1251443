@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissões necessárias para GPS e ligação à nuvem -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -24,13 +25,16 @@
             </intent-filter>
         </activity>
 
+        <!-- Demais Atividades da Aplicação -->
         <activity android:name=".LoginActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".MapActivity" android:exported="false" />
         <activity android:name=".RecycleActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
 
+        <!-- Chave de API do Google Maps -->
         <meta-data
-                android:name="com.google.android.gms.maps.API_KEY"
+                android:name="com.google.android.geo.API_KEY"
                 android:value="AIzaSyBhGnPn8tJV81Vj36DMqC8zm1xnYJTo8Ao" />
 
     </application>
