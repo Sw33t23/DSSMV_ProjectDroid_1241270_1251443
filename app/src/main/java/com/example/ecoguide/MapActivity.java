@@ -1,43 +1,30 @@
 package com.example.ecoguide;
 
-import android.content.Intent;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.ecoguide.data.SupabaseHelper;
-import com.example.ecoguide.utils.LocationHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private LocationHelper locationHelper;
     private SupabaseHelper supabaseHelper;
-
-    private double userLat = 0.0;
-    private double userLon = 0.0;
-    private double targetLat = 0.0;
-    private double targetLon = 0.0;
-    private String targetName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        locationHelper = new LocationHelper(this);
         supabaseHelper = new SupabaseHelper();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -46,92 +33,100 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             mapFragment.getMapAsync(this);
         }
 
-        Button btnNavigate = findViewById(R.id.btnNavigate);
-        btnNavigate.setOnClickListener(v -> {
-            if (targetLat != 0.0 && targetLon != 0.0) {
-                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + targetLat + "," + targetLon);
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(mapIntent);
-                } else {
-                    Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + targetLat + "," + targetLon));
-                    startActivity(webIntent);
-                }
-            } else {
-                Toast.makeText(this, "A calcular o ecoponto mais próximo...", Toast.LENGTH_SHORT).show();
-            }
-        });
+        Button btnFindClosest = findViewById(R.id.btnFindClosest);
+        if (btnFindClosest != null) {
+            btnFindClosest.setOnClickListener(v -> calcularEcopontoMaisProximo());
+        }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        locationHelper.getLastKnownLocation(new LocationHelper.LocationCallbackListener() {
+        LatLng defaultLocation = new LatLng(38.7369, -9.1426);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 12));
+
+        carregarEcopontosNoMapa();
+    }
+
+    private void carregarEcopontosNoMapa() {
+        supabaseHelper.getEcopontos(new SupabaseHelper.EcopontosCallback() {
             @Override
-            public void onLocationReceived(double latitude, double longitude) {
-                userLat = latitude;
-                userLon = longitude;
+            public void onEcopontosLoaded(JSONArray ecopontos) {
+                runOnUiThread(() -> {
+                    try {
+                        for (int i = 0; i < ecopontos.length(); i++) {
+                            JSONObject eco = ecopontos.getJSONObject(i);
+                            String name = eco.optString("name", "Ecoponto");
+                            double lat = eco.getDouble("latitude");
+                            double lng = eco.getDouble("longitude");
 
-                LatLng userLocation = new LatLng(userLat, userLon);
-                mMap.addMarker(new MarkerOptions().position(userLocation).title("A minha localização"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 14f));
-
-                loadEcopontosAndFindClosest();
+                            LatLng pos = new LatLng(lat, lng);
+                            mMap.addMarker(new MarkerOptions().position(pos).title(name));
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(MapActivity.this, "Erro ao processar ecopontos", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
-            public void onLocationError(String error) {
-                Toast.makeText(MapActivity.this, "Erro GPS: " + error, Toast.LENGTH_SHORT).show();
+            public void onError(String error) {
+                runOnUiThread(() -> Toast.makeText(MapActivity.this, "Erro: " + error, Toast.LENGTH_SHORT).show());
             }
         });
     }
 
-    private void loadEcopontosAndFindClosest() {
+    private void calcularEcopontoMaisProximo() {
         supabaseHelper.getEcopontos(new SupabaseHelper.EcopontosCallback() {
             @Override
             public void onEcopontosLoaded(JSONArray ecopontos) {
                 try {
-                    float minDistance = Float.MAX_VALUE;
-                    targetName = "";
+                    double userLat = 38.7369;
+                    double userLng = -9.1426;
+
+                    double minDistance = Double.MAX_VALUE;
+                    JSONObject closest = null;
+                    double closestLat = 0;
+                    double closestLng = 0;
 
                     for (int i = 0; i < ecopontos.length(); i++) {
-                        JSONObject obj = ecopontos.getJSONObject(i);
-                        String name = obj.getString("name");
-                        double lat = obj.getDouble("latitude");
-                        double lon = obj.getDouble("longitude");
-
-                        LatLng ecoLatLng = new LatLng(lat, lon);
-                        mMap.addMarker(new MarkerOptions().position(ecoLatLng).title("Ecoponto: " + name));
+                        JSONObject eco = ecopontos.getJSONObject(i);
+                        double ecoLat = eco.getDouble("latitude");
+                        double ecoLng = eco.getDouble("longitude");
 
                         float[] results = new float[1];
-                        Location.distanceBetween(userLat, userLon, lat, lon, results);
+                        Location.distanceBetween(userLat, userLng, ecoLat, ecoLng, results);
                         float distance = results[0];
 
                         if (distance < minDistance) {
                             minDistance = distance;
-                            targetName = name;
-                            targetLat = lat;
-                            targetLon = lon;
+                            closest = eco;
+                            closestLat = ecoLat;
+                            closestLng = ecoLng;
                         }
                     }
 
-                    final float finalMinDist = minDistance;
-                    final String finalName = targetName;
+                    if (closest != null) {
+                        String name = closest.optString("name", "Ecoponto");
+                        double finalClosestLat = closestLat;
+                        double finalClosestLng = closestLng;
+                        double finalDist = minDistance;
 
-                    runOnUiThread(() -> Toast.makeText(MapActivity.this,
-                            "Mais próximo: " + finalName + " (" + String.format("%.0f", finalMinDist) + "m)",
-                            Toast.LENGTH_LONG).show());
-
+                        runOnUiThread(() -> {
+                            LatLng pos = new LatLng(finalClosestLat, finalClosestLng);
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 15));
+                            Toast.makeText(MapActivity.this, "Mais próximo: " + name + " (" + (int)finalDist + "m)", Toast.LENGTH_LONG).show();
+                        });
+                    }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    runOnUiThread(() -> Toast.makeText(MapActivity.this, "Erro ao calcular distância", Toast.LENGTH_SHORT).show());
                 }
             }
 
             @Override
             public void onError(String error) {
-                runOnUiThread(() -> Toast.makeText(MapActivity.this, "Erro a carregar ecopontos: " + error, Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(MapActivity.this, "Erro ao carregar ecopontos", Toast.LENGTH_SHORT).show());
             }
         });
     }

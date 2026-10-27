@@ -2,7 +2,7 @@ package com.example.ecoguide;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,16 +30,20 @@ public class MainActivity extends AppCompatActivity {
         tvWelcome = findViewById(R.id.tvWelcome);
         tvUserPoints = findViewById(R.id.tvUserPoints);
         tvUserBadge = findViewById(R.id.tvUserBadge);
-        ImageButton btnLogout = findViewById(R.id.btnLogout);
+
+        // CORRIGIDO AQUI: Alterado de ImageButton para Button para corresponder ao XML
+        Button btnLogout = findViewById(R.id.btnLogout);
 
         // Lógica do botão de Logout
-        btnLogout.setOnClickListener(v -> {
-            currentUserId = -1L;
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> {
+                currentUserId = -1L;
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            });
+        }
 
         currentUsername = getIntent().getStringExtra("USERNAME_KEY");
         if (currentUsername == null) {
@@ -62,24 +66,26 @@ public class MainActivity extends AppCompatActivity {
         });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                return true;
-            } else if (id == R.id.nav_map) {
-                startActivity(new Intent(MainActivity.this, MapActivity.class));
-                return true;
-            } else if (id == R.id.nav_recycle) {
-                startActivity(new Intent(MainActivity.this, RecycleActivity.class));
-                return true;
-            } else if (id == R.id.nav_profile) {
-                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-                return true;
-            }
-            return false;
-        });
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.nav_home) {
+                    return true;
+                } else if (id == R.id.nav_map) {
+                    startActivity(new Intent(MainActivity.this, MapActivity.class));
+                    return true;
+                } else if (id == R.id.nav_recycle) {
+                    startActivity(new Intent(MainActivity.this, RecycleActivity.class));
+                    return true;
+                } else if (id == R.id.nav_profile) {
+                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                    return true;
+                }
+                return false;
+            });
+        }
     }
 
     private void loadUserData(long userId) {
@@ -87,14 +93,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPointsReceived(int points) {
                 runOnUiThread(() -> {
-                    tvUserPoints.setText(points + " pts");
-                    tvUserBadge.setText(calculateBadge(points));
+                    if (tvUserPoints != null) tvUserPoints.setText(points + " pts");
+                    if (tvUserBadge != null) tvUserBadge.setText(calculateBadge(points));
                 });
             }
 
             @Override
             public void onError(String error) {
-                runOnUiThread(() -> tvUserPoints.setText("0 pts"));
+                runOnUiThread(() -> {
+                    if (tvUserPoints != null) tvUserPoints.setText("0 pts");
+                });
             }
         });
     }

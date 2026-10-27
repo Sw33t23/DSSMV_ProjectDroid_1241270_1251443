@@ -40,7 +40,6 @@ public class SupabaseHelper {
         void onError(String error);
     }
 
-    // Método para encriptar a password com SHA-256
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -57,7 +56,6 @@ public class SupabaseHelper {
         }
     }
 
-    // Inserir Utilizador com diagnóstico completo do erro 400
     public void insertUser(String username, String password, SupabaseCallback callback) {
         String hashedPassword = hashPassword(password);
 
@@ -86,7 +84,6 @@ public class SupabaseHelper {
                 if (responseCode >= 200 && responseCode < 300) {
                     callback.onSuccess();
                 } else {
-                    // Capturar a mensagem de erro detalhada do Supabase
                     String errorDetails = "";
                     try {
                         BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), StandardCharsets.UTF_8));
@@ -100,8 +97,12 @@ public class SupabaseHelper {
                         errorDetails = "Não foi possível ler o detalhe do erro";
                     }
 
-                    Log.e("SupabaseError", "Erro 400 detalhado: " + errorDetails);
-                    callback.onError("Erro 400: " + errorDetails);
+                    Log.e("SupabaseError", "Erro: " + errorDetails);
+                    if (errorDetails.contains("23505")) {
+                        callback.onError("Este nome de utilizador já está a ser utilizado.");
+                    } else {
+                        callback.onError("Erro: " + errorDetails);
+                    }
                 }
                 conn.disconnect();
             } catch (Exception e) {
@@ -111,7 +112,6 @@ public class SupabaseHelper {
         });
     }
 
-    // Obter o ID real do utilizador por username
     public void getUserIdByUsername(String username, UserIdCallback callback) {
         executorService.execute(() -> {
             try {
@@ -124,8 +124,8 @@ public class SupabaseHelper {
                 int responseCode = conn.getResponseCode();
                 if (responseCode == 200) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                    String inputLine;
                     StringBuilder content = new StringBuilder();
+                    String inputLine;
                     while ((inputLine = in.readLine()) != null) {
                         content.append(inputLine);
                     }
@@ -150,7 +150,6 @@ public class SupabaseHelper {
         });
     }
 
-    // Inserir Registo de Reciclagem na tabela 'recycle_records'
     public void insertRecyclingRecord(long userId, int yellow, int green, int blue, int points, SupabaseCallback callback) {
         executorService.execute(() -> {
             try {
@@ -189,7 +188,6 @@ public class SupabaseHelper {
         });
     }
 
-    // Obter todos os ecopontos da tabela 'ecopontos' para o mapa
     public void getEcopontos(EcopontosCallback callback) {
         executorService.execute(() -> {
             try {
@@ -222,7 +220,6 @@ public class SupabaseHelper {
         });
     }
 
-    // Obter os pontos atuais do utilizador
     public void getUserPoints(long userId, PointsCallback callback) {
         executorService.execute(() -> {
             try {
