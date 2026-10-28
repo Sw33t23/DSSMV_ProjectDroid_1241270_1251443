@@ -97,7 +97,6 @@ public class SupabaseHelper {
                         errorDetails = "Não foi possível ler o detalhe do erro";
                     }
 
-                    Log.e("SupabaseError", "Erro: " + errorDetails);
                     if (errorDetails.contains("23505")) {
                         callback.onError("Este nome de utilizador já está a ser utilizado.");
                     } else {
@@ -150,7 +149,7 @@ public class SupabaseHelper {
         });
     }
 
-    public void insertRecyclingRecord(long userId, int yellow, int green, int blue, int points, SupabaseCallback callback) {
+    public void insertRecyclingRecord(long userId, int yellow, int green, int blue, int points, Long ecopontoId, SupabaseCallback callback) {
         executorService.execute(() -> {
             try {
                 URL url = new URL(SUPABASE_URL + "recycle_records");
@@ -168,6 +167,12 @@ public class SupabaseHelper {
                 jsonBody.put("sacks_green", green);
                 jsonBody.put("sacks_blue", blue);
                 jsonBody.put("points_earned", points);
+
+                if (ecopontoId != null) {
+                    jsonBody.put("ecoponto_id", ecopontoId);
+                } else {
+                    jsonBody.put("ecoponto_id", JSONObject.NULL);
+                }
 
                 try (OutputStream os = conn.getOutputStream()) {
                     byte[] input = jsonBody.toString().getBytes(StandardCharsets.UTF_8);

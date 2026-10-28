@@ -43,7 +43,8 @@ public class RecycleActivity extends AppCompatActivity {
             btnSubmit.setEnabled(false);
             Toast.makeText(this, "A enviar dados para a nuvem...", Toast.LENGTH_SHORT).show();
 
-            supabaseHelper.insertRecyclingRecord(userId, yellow, green, blue, earnedPoints, new SupabaseHelper.SupabaseCallback() {
+            // Envia o registo de reciclagem para a tabela recycle_records do Supabase
+            supabaseHelper.insertRecyclingRecord(userId, yellow, green, blue, earnedPoints, null, new SupabaseHelper.SupabaseCallback() {
                 @Override
                 public void onSuccess() {
                     runOnUiThread(() -> {

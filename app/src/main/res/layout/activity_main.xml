@@ -8,7 +8,6 @@
         android:background="#FAFAFA"
         tools:context=".MainActivity">
 
-    <!-- BOTÃO DE LOGOUT COM MARGEM SUFICIENTE PARA NÃO FICAR TAPADO -->
     <Button
             android:id="@+id/btnLogout"
             android:layout_width="wrap_content"
@@ -21,7 +20,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Texto de Boas-Vindas -->
     <TextView
             android:id="@+id/tvWelcome"
             android:layout_width="wrap_content"
@@ -35,7 +33,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Cartão de Pontos -->
     <androidx.cardview.widget.CardView
             android:id="@+id/cardPoints"
             android:layout_width="0dp"
@@ -76,7 +73,6 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Cartão de Medalha -->
     <androidx.cardview.widget.CardView
             android:id="@+id/cardBadge"
             android:layout_width="0dp"
@@ -117,7 +113,6 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Barra de Navegação Inferior -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="0dp"

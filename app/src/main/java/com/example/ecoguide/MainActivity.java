@@ -31,10 +31,8 @@ public class MainActivity extends AppCompatActivity {
         tvUserPoints = findViewById(R.id.tvUserPoints);
         tvUserBadge = findViewById(R.id.tvUserBadge);
 
-        // CORRIGIDO AQUI: Alterado de ImageButton para Button para corresponder ao XML
         Button btnLogout = findViewById(R.id.btnLogout);
 
-        // Lógica do botão de Logout
         if (btnLogout != null) {
             btnLogout.setOnClickListener(v -> {
                 currentUserId = -1L;
