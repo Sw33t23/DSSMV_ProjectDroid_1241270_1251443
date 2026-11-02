@@ -2,18 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
             android:id="@+id/nav_home"
-            android:title="Início"
-            android:icon="@android:drawable/ic_menu_compass" />
+            android:icon="@android:drawable/ic_menu_compass"
+            android:title="Início" />
     <item
             android:id="@+id/nav_map"
-            android:title="Mapa"
-            android:icon="@android:drawable/ic_menu_mapmode" />
+            android:icon="@android:drawable/ic_menu_mapmode"
+            android:title="Mapa" />
     <item
             android:id="@+id/nav_recycle"
-            android:title="Reciclar"
-            android:icon="@android:drawable/ic_menu_add" />
+            android:icon="@android:drawable/ic_menu_add"
+            android:title="Reciclar" />
     <item
             android:id="@+id/nav_profile"
-            android:title="Perfil"
-            android:icon="@android:drawable/ic_menu_myplaces" />
+            android:icon="@android:drawable/ic_menu_my_calendar"
+            android:title="Perfil" />
+    <item
+            android:id="@+id/nav_logout"
+            android:icon="@android:drawable/ic_lock_power_off"
+            android:title="Sair" />
 </menu>

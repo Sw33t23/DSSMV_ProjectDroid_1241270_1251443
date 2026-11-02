@@ -40,6 +40,11 @@ public class SupabaseHelper {
         void onError(String error);
     }
 
+    public interface EcopontoIdCallback {
+        void onEcopontoIdCreated(long ecopontoId);
+        void onError(String error);
+    }
+
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -255,6 +260,57 @@ public class SupabaseHelper {
                     }
                 } else {
                     callback.onError("Erro ao buscar pontos: " + responseCode);
+                }
+            } catch (Exception e) {
+                Log.e("SupabaseHelper", "Erro", e);
+                callback.onError(e.getMessage());
+            }
+        });
+    }
+
+    public void insertEcopontoAndGetId(String name, double latitude, double longitude, EcopontoIdCallback callback) {
+        executorService.execute(() -> {
+            try {
+                URL url = new URL(SUPABASE_URL + "ecopontos");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("apikey", API_KEY);
+                conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
+                conn.setRequestProperty("Prefer", "return=representation");
+                conn.setDoOutput(true);
+
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("name", name);
+                jsonBody.put("latitude", latitude);
+                jsonBody.put("longitude", longitude);
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonBody.toString().getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode >= 200 && responseCode < 300) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder content = new StringBuilder();
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        content.append(inputLine);
+                    }
+                    in.close();
+                    conn.disconnect();
+
+                    JSONArray jsonArray = new JSONArray(content.toString());
+                    if (jsonArray.length() > 0) {
+                        JSONObject obj = jsonArray.getJSONObject(0);
+                        long ecopontoId = obj.getLong("id");
+                        callback.onEcopontoIdCreated(ecopontoId);
+                    } else {
+                        callback.onError("Ecoponto criado mas ID não retornado.");
+                    }
+                } else {
+                    callback.onError("Erro HTTP (ecopontos): " + responseCode);
                 }
             } catch (Exception e) {
                 Log.e("SupabaseHelper", "Erro", e);

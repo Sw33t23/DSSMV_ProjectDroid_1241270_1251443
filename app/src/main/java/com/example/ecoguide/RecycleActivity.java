@@ -37,26 +37,48 @@ public class RecycleActivity extends AppCompatActivity {
 
             long userId = MainActivity.currentUserId;
             if (userId == -1L) {
-                userId = 1L;
+                userId = 1L; // Fallback de segurança
             }
 
-            btnSubmit.setEnabled(false);
-            Toast.makeText(this, "A enviar dados para a nuvem...", Toast.LENGTH_SHORT).show();
+            // Criamos uma variável final para ser aceite dentro da classe anónima do callback
+            final long finalUserId = userId;
 
-            // Envia o registo de reciclagem para a tabela recycle_records do Supabase
-            supabaseHelper.insertRecyclingRecord(userId, yellow, green, blue, earnedPoints, null, new SupabaseHelper.SupabaseCallback() {
+            btnSubmit.setEnabled(false);
+            Toast.makeText(this, "A registar ecoponto e reciclagem...", Toast.LENGTH_SHORT).show();
+
+            String nomeEcopontoDinamico = "Ecoponto Próximo (" + System.currentTimeMillis() + ")";
+            double latitudeAtual = 41.1579;
+            double longitudeAtual = -8.6291;
+
+            // 1. Criar/Inserir automaticamente o ecoponto no Supabase e obter o seu ID
+            supabaseHelper.insertEcopontoAndGetId(nomeEcopontoDinamico, latitudeAtual, longitudeAtual, new SupabaseHelper.EcopontoIdCallback() {
                 @Override
-                public void onSuccess() {
-                    runOnUiThread(() -> {
-                        Toast.makeText(RecycleActivity.this, "Sucesso! Ganhaste " + earnedPoints + " pontos.", Toast.LENGTH_LONG).show();
-                        finish();
+                public void onEcopontoIdCreated(long ecopontoId) {
+
+                    // 2. Com o ID obtido, inserir o registo de reciclagem associado usando a variável final
+                    supabaseHelper.insertRecyclingRecord(finalUserId, yellow, green, blue, earnedPoints, ecopontoId, new SupabaseHelper.SupabaseCallback() {
+                        @Override
+                        public void onSuccess() {
+                            runOnUiThread(() -> {
+                                Toast.makeText(RecycleActivity.this, "Sucesso! Ganhaste " + earnedPoints + " pontos.", Toast.LENGTH_LONG).show();
+                                finish();
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            runOnUiThread(() -> {
+                                Toast.makeText(RecycleActivity.this, "Erro no registo: " + error, Toast.LENGTH_LONG).show();
+                                btnSubmit.setEnabled(true);
+                            });
+                        }
                     });
                 }
 
                 @Override
                 public void onError(String error) {
                     runOnUiThread(() -> {
-                        Toast.makeText(RecycleActivity.this, "Erro ao enviar: " + error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(RecycleActivity.this, "Erro ao criar ecoponto: " + error, Toast.LENGTH_LONG).show();
                         btnSubmit.setEnabled(true);
                     });
                 }

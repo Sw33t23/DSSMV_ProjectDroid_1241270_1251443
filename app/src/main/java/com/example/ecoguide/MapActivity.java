@@ -22,12 +22,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
 
+    // Variável global que guarda o ID do ecoponto selecionado para usar na reciclagem
+    public static Long selectedEcopontoId = 1L; // ID padrão de segurança
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        // Inicializar o cliente de localização do Google Play Services
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -38,7 +40,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         Button btnFindClosest = findViewById(R.id.btnFindClosest);
         if (btnFindClosest != null) {
-            btnFindClosest.setOnClickListener(v -> obterLocalizacaoRealDoDispositivo());
+            btnFindClosest.setOnClickListener(v -> encontrarEcopontoMaisProximoNoGPS());
         }
     }
 
@@ -46,57 +48,49 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Ativar o botão azul de localização no mapa se houver permissões
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
 
-        // Posição padrão inicial de segurança (Lisboa, caso o GPS demore)
-        LatLng defaultLocation = new LatLng(38.7369, -9.1426);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 12));
+        // Posição padrão inicial em Portugal (caso o GPS demore)
+        LatLng defaultLocation = new LatLng(39.5572, -7.8394);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 7));
     }
 
-    private void obterLocalizacaoRealDoDispositivo() {
-        // Verificar se as permissões de localização foram concedidas
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            // Pedir permissões ao utilizador se não as tiver
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            Toast.makeText(this, "Por favor, concede permissão de localização.", Toast.LENGTH_LONG).show();
+    private void encontrarEcopontoMaisProximoNoGPS() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Permissão de localização necessária.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Obter a última localização conhecida real do dispositivo
         fusedLocationClient.getLastLocation().addOnSuccessListener(this, location -> {
             if (location != null) {
                 double userLat = location.getLatitude();
                 double userLng = location.getLongitude();
-
                 LatLng userPos = new LatLng(userLat, userLng);
 
-                // Criamos um ecoponto de teste virtual ligeiramente à frente da tua posição atual (ex: a ~500 metros)
-                // para poderes ver o cálculo a funcionar exatamente onde tu estás (seja em Coimbra, Porto, etc.)
-                double ecopontoLat = userLat + 0.004;
-                double ecopontoLng = userLng + 0.004;
-                LatLng ecopontoPos = new LatLng(ecopontoLat, ecopontoLng);
+                // Criar um ecoponto de teste perto da tua posição real atual
+                double ecoLat = userLat + 0.003;
+                double ecoLng = userLng + 0.003;
+                LatLng ecoPos = new LatLng(ecoLat, ecoLng);
 
-                // Limpar marcadores anteriores e adicionar o novo ecoponto perto de ti
+                // Definimos o ID do ecoponto (ex: ID 1 ou outro que tenhas na base de dados)
+                selectedEcopontoId = 1L;
+
                 mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(ecopontoPos).title("Ecoponto Próximo de Ti"));
-
-                // Centrar o mapa na tua posição atual com zoom
+                mMap.addMarker(new MarkerOptions().position(ecoPos).title("Ecoponto Mais Próximo"));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userPos, 14));
 
-                // Calcular a distância exata em metros entre ti e o ecoponto
                 float[] results = new float[1];
-                Location.distanceBetween(userLat, userLng, ecopontoLat, ecopontoLng, results);
+                Location.distanceBetween(userLat, userLng, ecoLat, ecoLng, results);
                 float distance = results[0];
 
-                Toast.makeText(MapActivity.this, "Estás aqui! Ecoponto mais próximo a " + (int)distance + " metros.", Toast.LENGTH_LONG).show();
+                Toast.makeText(MapActivity.this, "Ecoponto encontrado a " + (int)distance + " metros de ti!", Toast.LENGTH_LONG).show();
 
             } else {
-                Toast.makeText(MapActivity.this, "Não foi possível obter a localização atual. Verifica se o GPS está ligado.", Toast.LENGTH_LONG).show();
+                Toast.makeText(MapActivity.this, "Não foi possível obter a tua posição GPS atual.", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -3,6 +3,7 @@ package com.example.ecoguide;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,7 +18,8 @@ public class MainActivity extends AppCompatActivity {
     public static long currentUserId = -1L;
     private String currentUsername = "";
 
-    private TextView tvWelcome, tvUserPoints, tvUserBadge;
+    private TextView tvWelcome, tvUserPoints, tvUserBadge, tvProgressLabel;
+    private ProgressBar progressBarBadge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +32,17 @@ public class MainActivity extends AppCompatActivity {
         tvWelcome = findViewById(R.id.tvWelcome);
         tvUserPoints = findViewById(R.id.tvUserPoints);
         tvUserBadge = findViewById(R.id.tvUserBadge);
+        tvProgressLabel = findViewById(R.id.tvProgressLabel);
+        progressBarBadge = findViewById(R.id.progressBarBadge);
 
-        Button btnLogout = findViewById(R.id.btnLogout);
 
-        if (btnLogout != null) {
-            btnLogout.setOnClickListener(v -> {
-                currentUserId = -1L;
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
+        Button btnLeaderboard = findViewById(R.id.btnLeaderboard);
+
+
+
+        if (btnLeaderboard != null) {
+            btnLeaderboard.setOnClickListener(v -> {
+                startActivity(new Intent(MainActivity.this, LeaderboardActivity.class));
             });
         }
 
@@ -80,6 +83,13 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_profile) {
                     startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                     return true;
+                } else if (id == R.id.nav_logout) {
+                    currentUserId = -1L;
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                    return true;
                 }
                 return false;
             });
@@ -92,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPointsReceived(int points) {
                 runOnUiThread(() -> {
                     if (tvUserPoints != null) tvUserPoints.setText(points + " pts");
-                    if (tvUserBadge != null) tvUserBadge.setText(calculateBadge(points));
+                    updateBadgeAndProgress(points);
                 });
             }
 
@@ -105,13 +115,40 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private String calculateBadge(int points) {
-        if (points < 50) {
-            return "🌱 Eco-Iniciante";
-        } else if (points < 150) {
-            return "🌿 Eco-Amigo";
+    private void updateBadgeAndProgress(int points) {
+        // Sistema de 15 Medalhas (cada nível requer mais 50 pontos)
+        String[] badges = {
+                "🌱 Nível 1: Eco-Iniciante",
+                "🌿 Nível 2: Reciclador Júnior",
+                "♻️ Nível 3: Amigo do Ambiente",
+                "📘 Nível 4: Guardião do Papel",
+                "🟡 Nível 5: Protetor do Plástico",
+                "🟢 Nível 6: Mestre do Vidro",
+                "🔋 Nível 7: Defensor Energético",
+                "🌍 Nível 8: Eco-Ativista",
+                "🌳 Nível 9: Guardião da Floresta",
+                "💧 Nível 10: Protetor dos Oceanos",
+                "⭐ Nível 11: Herói Sustentável",
+                "🔥 Nível 12: Lenda da Reciclagem",
+                "👑 Nível 13: Imperador Verde",
+                "💎 Nível 14: Guardião Supremo",
+                "🌟 Nível 15: Divindade Ecológica"
+        };
+
+        int tierSize = 50; // 50 pontos por nível
+        int currentLevel = Math.min(points / tierSize, badges.length - 1);
+
+        tvUserBadge.setText(badges[currentLevel]);
+
+        if (currentLevel < badges.length - 1) {
+            int pointsInCurrentTier = points % tierSize;
+            int percentage = (pointsInCurrentTier * 100) / tierSize;
+
+            progressBarBadge.setProgress(percentage);
+            tvProgressLabel.setText("Progresso para o Nível " + (currentLevel + 2) + ": " + pointsInCurrentTier + "/" + tierSize + " pts");
         } else {
-            return "🌳 Mestre da Reciclagem";
+            progressBarBadge.setProgress(100);
+            tvProgressLabel.setText("Nível Máximo Atingido! 🏆");
         }
     }
 
