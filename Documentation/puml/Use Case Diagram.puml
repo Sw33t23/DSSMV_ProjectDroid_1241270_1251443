@@ -1,0 +1,31 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+left to right direction
+
+actor "User" as user
+
+rectangle "EcoGuide" {
+    usecase "UC1: Create Account" as UC1
+    usecase "UC2: Login " as UC2
+    usecase "UC3: Search EcoPoint" as UC3
+    usecase "UC4: Register Recycling" as UC4
+    usecase "UC5: Earn Points" as UC5
+    usecase "UC6: Unlock Badge" as UC6
+    usecase "UC7: View Profile & Stats" as UC7
+    usecase "UC8: View Leaderboard" as UC8
+    usecase "UC9: View Map Location" as UC9
+
+    user -- UC1
+    user -- UC2
+    user -- UC3
+    user -- UC4
+    user -- UC7
+    user -- UC8
+    user -- UC9
+
+    UC4 .> UC5 : <<include>>
+    UC6 .> UC4 : <<extend>>
+    UC4 .> UC9 : <<extend>>
+}
+@enduml

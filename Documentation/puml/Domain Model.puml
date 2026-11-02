@@ -1,0 +1,48 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+hide empty members
+skinparam classAttributeIconSize 0
+
+class "User" {
+    id: int
+    name: String
+    email: String
+    ecologicalPoints: int
+}
+
+class "Badge" {
+    id: int
+    name: String
+    description: String
+}
+
+class "RecyclingRecord" {
+     material: Material
+     quantity: double
+     date: String
+}
+
+class "EcoPoint" {
+    id: int
+    name: String
+    address: String
+    latitude: double
+    longitude: double
+    category: String
+}
+
+class "Material" {
+    name: String
+    pointsPerUnit: int
+}
+
+User "1" --> "*" Badge : Has >
+User "1" --> "*" RecyclingRecord : Records >
+
+RecyclingRecord "*" --> "1" Material : Uses >
+RecyclingRecord "*" --> "1" EcoPoint : Made at >
+
+EcoPoint "*" --> "*" Material : Accepts >
+
+@enduml
