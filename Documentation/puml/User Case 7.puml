@@ -1,0 +1,10 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+hide footbox
+actor User
+participant System
+
+User -> System : 1. Requests profile and statistics
+System -> System: 1.1 Retrieves User Data\n(points,badges,history)
+System --> User: return success & display
+@enduml
