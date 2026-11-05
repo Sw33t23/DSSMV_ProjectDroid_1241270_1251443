@@ -1,0 +1,12 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+hide footbox
+actor User
+participant System
+
+User -> System: 1. Requests Leaderboard
+System -> System: 1.1 Retrieves list of Users
+System -> System: 1.2 Sorts Users by ecologicalPoints
+System --> User : return success & display rankings
+
+@enduml
