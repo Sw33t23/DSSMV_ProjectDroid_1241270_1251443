@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+hide footbox
+actor User
+participant system
+
+User -> system : 1. Inserts account details\n(email and password)
+system -> system: 1.1 Checks if credentials are valid
+
+alt Credentials  valid : True
+    system --> User : returns success
+
+else Credentials valid : False
+    system --> User : returns failure
+end
+
+@enduml
