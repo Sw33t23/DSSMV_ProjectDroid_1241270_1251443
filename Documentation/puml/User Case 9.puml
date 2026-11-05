@@ -1,0 +1,19 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+hide footbox
+
+actor User
+participant System
+participant "Google Maps API" as Maps
+
+ User -> System: 1. Opens map View
+ System -> Maps: 1.1 Requests map interface
+ Maps --> System: 1.2 Returns map
+ System --> User: displays map with markers
+
+ opt User selects a markers
+    User -> System: 2. Clicks EcoPoint marker
+    System -> System: 2.1 Pre-fills EcoPoint data
+    System --> User: redirects to UC4 (Register Recycling)
+end
+@enduml
