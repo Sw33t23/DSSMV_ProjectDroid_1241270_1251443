@@ -1,0 +1,34 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+package "com.example.ecoguide"{
+package "data" {
+    class SupabaseHelper
+  }
+
+  package "model" {
+    class User
+    class EcoPoint
+    class RecyclingRecord
+  }
+
+  package "utils" {
+    class MapHelper
+    class SessionManager
+  }
+
+  class LoginActivity
+  class MainActivity
+  class MapActivity
+  class ProfileActivity
+  class RecycleActivity
+  class RegisterActivity
+}
+
+package "res" {
+  package "layout" {}
+  package "menu" {}
+  package "values" {}
+  package "xml" {}
+}
+}
+@enduml
