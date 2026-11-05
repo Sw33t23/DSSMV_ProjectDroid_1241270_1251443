@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+package "EcoGuide Client" {
+    component "UI (Activities)" as UI
+    component "Utils" as Utils
+    component "Data (Supabase Helper)" as Data
+    component "Model" as Model
+
+    UI.>Utils : uses
+    UI.> Data: requests
+    Data.> Model: maps to
+}
+
+interface "Supabase Cloud" as Cloud
+Data --( Cloud : Network Call
+@enduml
