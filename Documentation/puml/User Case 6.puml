@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+hide footbox
+participant "System(UC4)" as UC4
+participant System
+
+UC4 -> System : 1. Evaluates badge criteria
+System -> System : 1.1 Checks if user met new thresholds
+
+alt Threshold met : True
+    System -> System: 1.2 Assigns new Badge to User
+    System --> UC4: return success & notify  user
+else Threshold met : False
+System --> UC4: return no action
+end
+
+@enduml
