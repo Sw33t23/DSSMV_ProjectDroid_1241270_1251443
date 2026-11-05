@@ -1,0 +1,21 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+hide footbox
+actor User
+participant System
+
+User -> System : 1. Submits recycling details\n(material,quantity,EcoPoint)
+System -> System: 1.1 Validates input data
+
+alt Data is valid : True
+System -> System : 1.2 Saves RecyclingRecord
+System -> System : 1.3 Executes UC5 (Earn Points)
+System -> System : 1.4 Evaluates UC6 (Unlock Badge)
+System --> User : return success
+
+else Data is valid : False
+System --> User : return failure
+end
+
+
+ @enduml
