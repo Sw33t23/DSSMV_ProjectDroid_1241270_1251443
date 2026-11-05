@@ -1,0 +1,18 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+hide footbox
+actor User
+participant System
+
+User -> System : Searches for EcoPoints\n(by location or category)
+System -> System: Validates search parameters
+
+alt Parameters valid : True
+    System -> System : Fetches matching EcoPoints
+    System --> User : returns success & display list
+
+else Parameters valid : False
+    System --> User : return failure
+end
+
+@enduml
