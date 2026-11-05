@@ -1,0 +1,45 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+skinparam classAttributeIconSize 0
+
+class User {
+    - id:int
+    - name : String
+    - email : String
+    - password: String
+    - ecologicalPoints: int
+    + login(): boolean
+    + registerRecycling(record: RecyclingRecord): void
+    + updatePoints(points: int): void
+}
+class Badge {
+  - id: int
+  - name: String
+  - description: String
+  - pointsRequired: int
+}
+class RecyclingRecord {
+  - recordId: int
+  - quantity: double
+  - date: String
+  + calculatePoints(): int
+}
+class EcoPoint {
+  - id: int
+  - name: String
+  - address: String
+  - latitude: double
+  - longitude: double
+  - category: String
+  + getCoordinates(): String
+}
+class Material {
+  - name: String
+  - pointsPerUnit: int
+}
+User "1" --> "*" Badge : unlocks >
+User "1" --> "*" RecyclingRecord : registers >
+RecyclingRecord "*" --> "1" Material : contains >
+RecyclingRecord "*" --> "1" EcoPoint : located at >
+EcoPoint "*" --> "*" Material : accepts >
+@enduml
