@@ -1,0 +1,11 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+node "Android Device"{
+ component "EcoGuide App" as App
+}
+
+node "Server"{
+ component "Supabase API" as API
+}
+App -right- API: HTTPS/Network
+@enduml
