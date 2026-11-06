@@ -5,7 +5,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FAFAFA"
+        android:background="#F8F9FA"
         tools:context=".MainActivity">
 
     <TextView
@@ -15,22 +15,23 @@
             android:text="🌱 Olá, Utilizador!"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginTop="52dp"
+            android:textColor="#212529"
+            android:layout_marginTop="56dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Cartão de Pontos -->
+    <!-- Cartão de Pontos Moderno -->
     <androidx.cardview.widget.CardView
             android:id="@+id/cardPoints"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginTop="20dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#FFFFFF"
             app:layout_constraintTop_toBottomOf="@id/tvWelcome"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -40,38 +41,40 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="16dp">
+                android:padding="20dp">
 
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Os Teus Pontos"
-                    android:textSize="14sp"
-                    android:textColor="#666666" />
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#6C757D" />
 
             <TextView
                     android:id="@+id/tvUserPoints"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0 pts"
-                    android:textSize="28sp"
+                    android:textSize="32sp"
                     android:textStyle="bold"
-                    android:textColor="#4CAF50"
-                    android:layout_marginTop="4dp" />
+                    android:textColor="#2ECC71"
+                    android:layout_marginTop="6dp" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Cartão de Medalha e Barra de Progresso -->
+    <!-- Cartão de Medalha e Barra de Progresso Moderna -->
     <androidx.cardview.widget.CardView
             android:id="@+id/cardBadge"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#FFFFFF"
             app:layout_constraintTop_toBottomOf="@id/cardPoints"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -80,14 +83,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Medalha Atual"
-                    android:textSize="14sp"
-                    android:textColor="#666666"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#6C757D"
                     android:layout_gravity="center" />
 
             <TextView
@@ -97,43 +101,45 @@
                     android:text="🌱 Eco-Iniciante"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#FF9800"
-                    android:layout_marginTop="4dp"
+                    android:textColor="#E67E22"
+                    android:layout_marginTop="6dp"
                     android:layout_gravity="center" />
 
-            <!-- Barra de Progresso até à próxima medalha -->
             <TextView
                     android:id="@+id/tvProgressLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Progresso para a próxima medalha: 0/50 pts"
+                    android:text="Progresso para o Nível 2: 0/50 pts"
                     android:textSize="12sp"
-                    android:textColor="#888888"
-                    android:layout_marginTop="12dp" />
+                    android:textColor="#adb5bd"
+                    android:layout_marginTop="16dp" />
 
             <ProgressBar
                     android:id="@+id/progressBarBadge"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="8dp"
+                    android:layout_height="10dp"
                     android:progressDrawable="@drawable/custom_progress"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
                     android:max="100"
                     android:progress="0" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Botão para abrir a Leaderboard -->
+    <!-- Botão Leaderboard com curvas suaves -->
     <Button
             android:id="@+id/btnLeaderboard"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="54dp"
             android:text="🏆 Ver Leaderboard Global"
-            android:backgroundTint="#4CAF50"
+            android:backgroundTint="#2ECC71"
             android:textColor="#FFFFFF"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:cornerRadius="16dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginTop="24dp"
             app:layout_constraintTop_toBottomOf="@id/cardBadge"
             app:layout_constraintStart_toStartOf="parent"
@@ -145,6 +151,8 @@
             android:layout_height="wrap_content"
             android:background="#FFFFFF"
             app:menu="@menu/bottom_nav_menu"
+            app:itemIconTint="@color/black"
+            app:itemTextColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

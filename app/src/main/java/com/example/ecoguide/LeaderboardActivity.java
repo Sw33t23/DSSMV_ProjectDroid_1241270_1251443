@@ -1,7 +1,6 @@
 package com.example.ecoguide;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +20,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     private ListView listViewLeaderboard;
     private ArrayList<String> leaderboardList;
-    private ArrayAdapter<String> adapter;
+    private LeaderboardAdapter adapter;
 
     private static final String SUPABASE_URL = "https://hhmfwgstwpjeegojygog.supabase.co/rest/v1/";
     private static final String API_KEY = "sb_publishable_1T4WcsZ2mz4cvgOsPKN9-A_RuAysq0O";
@@ -33,7 +32,8 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         listViewLeaderboard = findViewById(R.id.listViewLeaderboard);
         leaderboardList = new ArrayList<>();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, leaderboardList);
+
+        adapter = new LeaderboardAdapter(this, leaderboardList);
         listViewLeaderboard.setAdapter(adapter);
 
         fetchLeaderboardData();
@@ -43,7 +43,6 @@ public class LeaderboardActivity extends AppCompatActivity {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                // Pedido ao Supabase ordenado por total_points de forma descendente (maior para menor)
                 URL url = new URL(SUPABASE_URL + "users?select=username,total_points&order=total_points.desc&limit=10");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
@@ -70,7 +69,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                         int points = user.getInt("total_points");
 
                         String rankEmoji = (i == 0) ? "🥇 " : (i == 1) ? "🥈 " : (i == 2) ? "🥉 " : (i + 1) + "º ";
-                        leaderboardList.add(rankEmoji + username + " — " + points + " pts");
+                        leaderboardList.add(rankEmoji + " " + username + "  —  " + points + " pts");
                     }
 
                     runOnUiThread(() -> adapter.notifyDataSetChanged());

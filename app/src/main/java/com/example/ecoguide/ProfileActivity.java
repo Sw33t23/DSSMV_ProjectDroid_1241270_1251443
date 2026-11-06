@@ -1,7 +1,6 @@
 package com.example.ecoguide;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,7 +38,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onPointsReceived(int points) {
                 runOnUiThread(() -> {
                     if (tvProfileTitle != null) {
-                        tvProfileTitle.setText("As Tuas Conquistas (" + points + " pts)");
+                        tvProfileTitle.setText("🏆 Conquistas (" + points + " pts)");
                     }
                     populateBadgesList(points);
                 });
@@ -49,7 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onError(String error) {
                 runOnUiThread(() -> {
                     if (tvProfileTitle != null) {
-                        tvProfileTitle.setText("As Tuas Conquistas (0 pts)");
+                        tvProfileTitle.setText("🏆 Conquistas (0 pts)");
                     }
                     populateBadgesList(0);
                 });
@@ -58,6 +57,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void populateBadgesList(int userPoints) {
+        // Lista completa com as 15 medalhas do sistema
         String[] allBadges = {
                 "🌱 Nível 1: Eco-Iniciante (0+ pts)",
                 "🌿 Nível 2: Reciclador Júnior (50+ pts)",
@@ -88,7 +88,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, displayList);
+        BadgeAdapter adapter = new BadgeAdapter(this, displayList);
         if (listViewBadges != null) {
             listViewBadges.setAdapter(adapter);
         }

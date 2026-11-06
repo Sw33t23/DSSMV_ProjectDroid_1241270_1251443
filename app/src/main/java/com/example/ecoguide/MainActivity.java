@@ -1,6 +1,7 @@
 package com.example.ecoguide;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -35,10 +36,7 @@ public class MainActivity extends AppCompatActivity {
         tvProgressLabel = findViewById(R.id.tvProgressLabel);
         progressBarBadge = findViewById(R.id.progressBarBadge);
 
-
         Button btnLeaderboard = findViewById(R.id.btnLeaderboard);
-
-
 
         if (btnLeaderboard != null) {
             btnLeaderboard.setOnClickListener(v -> {
@@ -48,8 +46,11 @@ public class MainActivity extends AppCompatActivity {
 
         currentUsername = getIntent().getStringExtra("USERNAME_KEY");
         if (currentUsername == null) {
-            currentUsername = "EcoUtilizador";
+            // Fallback caso venha direto da sessão guardada sem Intent extra
+            SharedPreferences prefs = getSharedPreferences("EcoGuidePrefs", MODE_PRIVATE);
+            currentUsername = prefs.getString("LOGGED_USER", "EcoUtilizador");
         }
+
         tvWelcome.setText("🌱 Olá, " + currentUsername + "!");
 
         supabaseHelper.getUserIdByUsername(currentUsername, new SupabaseHelper.UserIdCallback() {
@@ -84,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                     return true;
                 } else if (id == R.id.nav_logout) {
+                    // Limpar a sessão guardada nas SharedPreferences ao fazer Logout
+                    SharedPreferences prefs = getSharedPreferences("EcoGuidePrefs", MODE_PRIVATE);
+                    prefs.edit().clear().apply();
+
                     currentUserId = -1L;
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -116,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateBadgeAndProgress(int points) {
-        // Sistema de 15 Medalhas (cada nível requer mais 50 pontos)
         String[] badges = {
                 "🌱 Nível 1: Eco-Iniciante",
                 "🌿 Nível 2: Reciclador Júnior",
@@ -135,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 "🌟 Nível 15: Divindade Ecológica"
         };
 
-        int tierSize = 50; // 50 pontos por nível
+        int tierSize = 50;
         int currentLevel = Math.min(points / tierSize, badges.length - 1);
 
         tvUserBadge.setText(badges[currentLevel]);

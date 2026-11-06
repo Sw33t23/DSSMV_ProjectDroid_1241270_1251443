@@ -1,94 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:padding="24dp">
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#F8F9FA"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
 
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Registar Reciclagem por Ecoponto"
-            android:textSize="20sp"
+            android:text="♻️ Registar Reciclagem"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginBottom="24dp"/>
+            android:textColor="#212529"
+            android:layout_marginBottom="32dp" />
 
-    <!-- Ecoponto Amarelo -->
-    <LinearLayout
+    <!-- Campo Saca Amarela -->
+    <EditText
+            android:id="@+id/etYellowSacks"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+            android:layout_height="54dp"
+            android:hint="Sacas Amarelas (Plástico/Metal)"
+            android:inputType="number"
+            android:background="@drawable/card_background"
+            android:paddingHorizontal="16dp"
+            android:textSize="15sp"
+            android:textColor="#212529"
+            android:layout_marginBottom="16dp" />
 
-        <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="🟡 Amarelo (15 pts/saca)"
-                android:textStyle="bold"/>
-
-        <EditText
-                android:id="@+id/etYellowSacks"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:hint="0"
-                android:gravity="center"/>
-    </LinearLayout>
-
-    <!-- Ecoponto Verde -->
-    <LinearLayout
+    <!-- Campo Saca Verde -->
+    <EditText
+            android:id="@+id/etGreenSacks"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+            android:layout_height="54dp"
+            android:hint="Sacas Verdes (Vidro)"
+            android:inputType="number"
+            android:background="@drawable/card_background"
+            android:paddingHorizontal="16dp"
+            android:textSize="15sp"
+            android:textColor="#212529"
+            android:layout_marginBottom="16dp" />
 
-        <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="🟢 Verde (10 pts/saca)"
-                android:textStyle="bold"/>
-
-        <EditText
-                android:id="@+id/etGreenSacks"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:hint="0"
-                android:gravity="center"/>
-    </LinearLayout>
-
-    <!-- Ecoponto Azul -->
-    <LinearLayout
+    <!-- Campo Saca Azul -->
+    <EditText
+            android:id="@+id/etBlueSacks"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="32dp">
+            android:layout_height="54dp"
+            android:hint="Sacas Azuis (Papel/Cartão)"
+            android:inputType="number"
+            android:background="@drawable/card_background"
+            android:paddingHorizontal="16dp"
+            android:textSize="15sp"
+            android:textColor="#212529"
+            android:layout_marginBottom="28dp" />
 
-        <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="🔵 Azul (5 pts/saca)"
-                android:textStyle="bold"/>
-
-        <EditText
-                android:id="@+id/etBlueSacks"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:hint="0"
-                android:gravity="center"/>
-    </LinearLayout>
-
+    <!-- Botão Submeter -->
     <Button
             android:id="@+id/btnSubmitRecycle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Submeter Registos e Calcular Pontos"/>
+            android:layout_height="54dp"
+            android:text="Submeter e Ganhar Pontos"
+            android:backgroundTint="#2ECC71"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:cornerRadius="16dp" />
 
 </LinearLayout>

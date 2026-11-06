@@ -4,25 +4,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#FAFAFA"
-        android:padding="16dp">
+        android:background="#F8F9FA"
+        android:padding="20dp">
 
+    <!-- Cabeçalho do Perfil -->
     <TextView
             android:id="@+id/tvProfileTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="As Tuas Conquistas"
-            android:textSize="20sp"
+            android:text="🏆 As Tuas Conquistas"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="#333333"
+            android:textColor="#212529"
             android:gravity="center"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="20dp" />
 
+    <!-- Lista de Medalhas Estilizada -->
     <ListView
             android:id="@+id/listViewBadges"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp" />
+            android:divider="@android:color/transparent"
+            android:dividerHeight="10dp"
+            android:clipToPadding="false" />
 
 </LinearLayout>
