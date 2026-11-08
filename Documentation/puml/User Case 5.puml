@@ -5,7 +5,7 @@ participant "System(UC4)" as UC4
 participant System
 
 UC4 -> System : 1. Initiates point Calculation
-System -> System: 1.1 Calculates points based\non material and quantity
+System -> System: 1.1Calculates points based on sack quantities
 System -> System: 1.2 Adds points to User's total
 System --> UC4: return success
 @enduml
