@@ -4,7 +4,7 @@ hide footbox
 actor User
 participant System
 
-User -> System : 1. Submits recycling details\n(material,quantity,EcoPoint)
+User -> System : 1. Submits recycling details (sack quantities, EcoPoint)
 System -> System: 1.1 Validates input data
 
 alt Data is valid : True
