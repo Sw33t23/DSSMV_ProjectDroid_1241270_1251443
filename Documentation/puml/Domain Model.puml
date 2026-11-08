@@ -11,38 +11,25 @@ class "User" {
     ecologicalPoints: int
 }
 
-class "Badge" {
-    id: int
-    name: String
-    description: String
-}
 
-class "RecyclingRecord" {
-     material: Material
-     quantity: double
-     date: String
+class "RecycleRecord" {
+    id: int
+    sacksYellow: int
+    sacksBlue: int
+    sacksGreen: int
+    pointsEarned: int
+    createdAt: String
 }
 
 class "EcoPoint" {
     id: int
     name: String
-    address: String
     latitude: double
     longitude: double
-    category: String
 }
 
-class "Material" {
-    name: String
-    pointsPerUnit: int
-}
 
-User "1" --> "*" Badge : Has >
-User "1" --> "*" RecyclingRecord : Records >
-
-RecyclingRecord "*" --> "1" Material : Uses >
-RecyclingRecord "*" --> "1" EcoPoint : Made at >
-
-EcoPoint "*" --> "*" Material : Accepts >
+User "1" --> "*" RecycleRecord : Registers >
+RecycleRecord "*" --> "1" EcoPoint : Located at >
 
 @enduml
