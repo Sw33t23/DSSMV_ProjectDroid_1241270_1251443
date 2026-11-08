@@ -1,8 +1,14 @@
 package com.example.ecoguide;
 
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ecoguide.data.SupabaseHelper;
@@ -13,6 +19,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private TextView tvProfileTitle;
     private ListView listViewBadges;
+    private Button btnEditUsername, btnDeleteAccount;
     private SupabaseHelper supabaseHelper;
 
     @Override
@@ -22,14 +29,88 @@ public class ProfileActivity extends AppCompatActivity {
 
         tvProfileTitle = findViewById(R.id.tvProfileTitle);
         listViewBadges = findViewById(R.id.listViewBadges);
+        btnEditUsername = findViewById(R.id.btnEditUsername);
+        btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
         supabaseHelper = new SupabaseHelper();
 
-        long userId = MainActivity.currentUserId;
-        if (userId == -1L) {
-            userId = 1L;
-        }
+        // Declarar final para garantir compatibilidade com expressões lambda
+        final long userId = (MainActivity.currentUserId != -1L) ? MainActivity.currentUserId : 1L;
 
         loadUserBadges(userId);
+
+        // Ação para Alterar Nome (Método PATCH)
+        if (btnEditUsername != null) {
+            btnEditUsername.setOnClickListener(v -> showEditUsernameDialog(userId));
+        }
+
+        // Ação para Apagar Conta (Método DELETE)
+        if (btnDeleteAccount != null) {
+            btnDeleteAccount.setOnClickListener(v -> showDeleteConfirmationDialog(userId));
+        }
+    }
+
+    private void showEditUsernameDialog(final long userId) {
+        final EditText input = new EditText(this);
+        input.setHint("Novo nome de utilizador");
+        input.setPadding(40, 30, 40, 30);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Alterar Nome de Utilizador")
+                .setView(input)
+                .setPositiveButton("Guardar", (dialog, which) -> {
+                    String newName = input.getText().toString().trim();
+                    if (!newName.isEmpty()) {
+                        supabaseHelper.updateUsername(userId, newName, new SupabaseHelper.SupabaseCallback() {
+                            @Override
+                            public void onSuccess() {
+                                runOnUiThread(() -> {
+                                    Toast.makeText(ProfileActivity.this, "Nome atualizado com sucesso!", Toast.LENGTH_SHORT).show();
+                                    SharedPreferences.Editor editor = getSharedPreferences("EcoGuidePrefs", MODE_PRIVATE).edit();
+                                    editor.putString("LOGGED_USER", newName);
+                                    editor.apply();
+                                    recreate(); // Reinicia a activity para refletir as mudanças
+                                });
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                runOnUiThread(() -> Toast.makeText(ProfileActivity.this, "Erro ao atualizar: " + error, Toast.LENGTH_LONG).show());
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void showDeleteConfirmationDialog(final long userId) {
+        new AlertDialog.Builder(this)
+                .setTitle("Apagar Conta")
+                .setMessage("Tens a certeza que pretendes apagar a tua conta permanentemente? Esta ação não pode ser desfeita.")
+                .setPositiveButton("Sim, Apagar", (dialog, which) -> {
+                    supabaseHelper.deleteUserAccount(userId, new SupabaseHelper.SupabaseCallback() {
+                        @Override
+                        public void onSuccess() {
+                            runOnUiThread(() -> {
+                                SharedPreferences prefs = getSharedPreferences("EcoGuidePrefs", MODE_PRIVATE);
+                                prefs.edit().clear().apply();
+
+                                Toast.makeText(ProfileActivity.this, "Conta apagada com sucesso.", Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                                finish();
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            runOnUiThread(() -> Toast.makeText(ProfileActivity.this, "Erro ao apagar conta: " + error, Toast.LENGTH_LONG).show());
+                        }
+                    });
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     private void loadUserBadges(long userId) {
@@ -57,7 +138,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void populateBadgesList(int userPoints) {
-        // Lista completa com as 15 medalhas do sistema
         String[] allBadges = {
                 "🌱 Nível 1: Eco-Iniciante (0+ pts)",
                 "🌿 Nível 2: Reciclador Júnior (50+ pts)",

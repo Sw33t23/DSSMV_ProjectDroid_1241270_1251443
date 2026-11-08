@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -17,7 +18,43 @@
             android:textStyle="bold"
             android:textColor="#212529"
             android:gravity="center"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="16dp" />
+
+    <!-- Botões de Ação de Conta (Editar e Apagar) -->
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:weightSum="2">
+
+        <Button
+                android:id="@+id/btnEditUsername"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="✏️ Alterar Nome"
+                android:backgroundTint="#3498DB"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"
+                android:layout_marginEnd="6dp" />
+
+        <Button
+                android:id="@+id/btnDeleteAccount"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="🗑️ Apagar Conta"
+                android:backgroundTint="#E74C3C"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"
+                android:layout_marginStart="6dp" />
+
+    </LinearLayout>
 
     <!-- Lista de Medalhas Estilizada -->
     <ListView

@@ -318,4 +318,64 @@ public class SupabaseHelper {
             }
         });
     }
+
+    // ==========================================
+    // NOVOS MÉTODOS (PATCH e DELETE para o CRUD completo)
+    // ==========================================
+
+    public void updateUsername(long userId, String newUsername, SupabaseCallback callback) {
+        executorService.execute(() -> {
+            try {
+                URL url = new URL(SUPABASE_URL + "users?id=eq." + userId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("PATCH");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("apikey", API_KEY);
+                conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
+                conn.setDoOutput(true);
+
+                JSONObject jsonBody = new JSONObject();
+                jsonBody.put("username", newUsername);
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonBody.toString().getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode >= 200 && responseCode < 300) {
+                    callback.onSuccess();
+                } else {
+                    callback.onError("Erro ao atualizar nome: " + responseCode);
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("SupabaseHelper", "Erro PATCH", e);
+                callback.onError(e.getMessage());
+            }
+        });
+    }
+
+    public void deleteUserAccount(long userId, SupabaseCallback callback) {
+        executorService.execute(() -> {
+            try {
+                URL url = new URL(SUPABASE_URL + "users?id=eq." + userId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("DELETE");
+                conn.setRequestProperty("apikey", API_KEY);
+                conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode >= 200 && responseCode < 300) {
+                    callback.onSuccess();
+                } else {
+                    callback.onError("Erro ao apagar conta: " + responseCode);
+                }
+                conn.disconnect();
+            } catch (Exception e) {
+                Log.e("SupabaseHelper", "Erro DELETE", e);
+                callback.onError(e.getMessage());
+            }
+        });
+    }
 }
