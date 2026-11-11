@@ -319,9 +319,6 @@ public class SupabaseHelper {
         });
     }
 
-    // ==========================================
-    // NOVOS MÉTODOS (PATCH e DELETE para o CRUD completo)
-    // ==========================================
 
     public void updateUsername(long userId, String newUsername, SupabaseCallback callback) {
         executorService.execute(() -> {
